@@ -33,6 +33,11 @@ void initializeBubbles()
     for(it = 0; it < ARRAY_SIZE; it++)
     {
         BUBBLES[it] = bubbleConstructor();
+
+        BUBBLES[it].id = it;
+        BUBBLES[it].x_loc = ((it*BUBBLE_WIDTH) + (BUBBLE_WIDTH/2)) % X_MAX;
+        BUBBLES[it].y_loc = ((it*BUBBLE_WIDTH) + (BUBBLE_WIDTH/2)) % Y_MAX;
+
         int randomColour = rand()%4;
 
         switch (randomColour)
