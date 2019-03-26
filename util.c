@@ -15,7 +15,7 @@ struct bubble bubbleConstructor()
     newBubble.x_loc = NULL;
     newBubble.y_loc = NULL;
     newBubble.colour = BLACK;
-    newBubble.next = NULL;
+    newBubble.visited = false;
 
     return newBubble;
 }
@@ -62,42 +62,44 @@ void initializeBubbles()
 
 void setupColourMatchLinks()
 {
-    struct bubble uniqueColours[4];
-
-    int i, j;
-    for(i = 0; i < 4; i++)
-    {
-        uniqueColours[i] = bubbleConstructor();
-    }
-
+    int i, j, x_dir, y_dir;
     for(i = 0; i < ARRAY_SIZE; i++)
     {
-        for(j = 0; j < uniqueColours; j++)
+        for(x_dir = BUBBLES[i].x_loc - BUBBLE_WIDTH; x_dir <= BUBBLES[i].x_loc + BUBBLE_WIDTH; x_dir += BUBBLE_WIDTH)
         {
-            if(BUBBLES[i].colour == uniqueColours[j].colour)
+            for(y_dir = BUBBLES[i].y_loc - BUBBLE_WIDTH; y_dir <= BUBBLES[i].y_loc + BUBBLE_WIDTH; y_dir += BUBBLE_WIDTH)
             {
-                bool checkIfMatch = checkForMatch(&uniqueColours[j], &BUBBLES[i]);
-                if (checkIfMatch){
-                    BUBBLES[i].next = &BUBBLES[uniqueColours[j].id];
-                    uniqueColours[j].id = BUBBLES[i].id;
-                } 
-
-            }else if(uniqueColours[j].colour == BLACK)
-            {
-                uniqueColours[j].id = BUBBLES[i].id;
-                uniqueColours[j].x_loc = BUBBLES[i].x_loc;
-                uniqueColours[j].y_loc = BUBBLES[i].y_loc;
-                uniqueColours[j].colour = BUBBLES[i].colour;
-            }
+                if(!(x_dir == BUBBLES[i].x_loc && y_dir == BUBBLES[i].y_loc) && (x_dir > 0 && x_dir < X_MAX) && (y_dir > 0 && y_dir < Y_MAX*0.5))
+                {
+                    int neighbourId = coordsToId(x_dir, y_dir);
+                    if(neighbourId != -1 && BUBBLES[i].colour == BUBBLES[neighbourId].colour)
+                    {
+                        for(j = 0; j < 8; j++)
+                        {
+                            if(BUBBLES[i].next[j] == NULL)
+                            {
+                               BUBBLES[i].next[j] = &BUBBLES[neighbourId];
+                               break; 
+                            } 
+                        }
+                    } 
+                }
+            }    
         }
     }
 }
 
 void wipeoutMatchingColours(struct bubble* startingBubble)
 {
-    if (startingBubble->next != NULL) wipeoutMatchingColours(startingBubble->next);
-    startingBubble->colour = BLACK;
-    return;
+    startingBubble->visited = true;
+
+    int i;
+    for(i = 0; i < 8; i++)
+    {
+        if(startingBubble->next[i] != NULL && !startingBubble->next[i]->visited) wipeoutMatchingColours(startingBubble->next[i]);
+        startingBubble->colour = BLACK;
+        return;
+    }
 }
 
 void drawBubbles()
@@ -105,14 +107,25 @@ void drawBubbles()
     int count, x, y;
     for(count = 0; count < ARRAY_SIZE; count++)
     {
-        for(x = BUBBLES[count].x_loc-1; x <= BUBBLES[count].x_loc+1; x++)
+        for(x = BUBBLES[count].x_loc-(BUBBLE_WIDTH/2); x <= BUBBLES[count].x_loc+(BUBBLE_WIDTH/2); x+=(BUBBLE_WIDTH/2))
         {
-            for(y = BUBBLES[count].y_loc-1; y <= BUBBLES[count].y_loc+1; y++)
+            for(y = BUBBLES[count].y_loc-(BUBBLE_WIDTH/2); y <= BUBBLES[count].y_loc+(BUBBLE_WIDTH/2); y+=(BUBBLE_WIDTH/2))
             {
                 if(x>=0 && x<=X_MAX && y>=0 && y<=Y_MAX) plot_pixel(x, y, BUBBLES[count].colour);
             }
         }
     }
+}
+
+int coordsToId(int x, int y)
+{
+    int i;
+    for(i = 0; i < ARRAY_SIZE; i++)
+    {
+        if(BUBBLES[i].x_loc == x && BUBBLES[i].y_loc == y) return BUBBLES[i].id;
+    }
+
+    return -1;
 }
 
 void plot_pixel(int x, int y, short int line_color)
