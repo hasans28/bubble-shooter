@@ -14,29 +14,30 @@ struct bubble bubbleConstructor()
     newBubble.id = NULL;
     newBubble.x_loc = NULL;
     newBubble.y_loc = NULL;
+    newBubble.x_vel = 0;
+    newBubble.y_vel = 0;
     newBubble.colour = BLACK;
     newBubble.visited = false;
+
+    int i;
+    for(i = 0; i < 8; i++)
+    {
+        newBubble.next[i] = NULL;
+    }
 
     return newBubble;
 }
 
-bool checkForMatch(struct bubble* bubble1, struct bubble* bubble2)
-{
-    return (abs(bubble1->x_loc - bubble2->x_loc) <= 2) && (abs(bubble1->y_loc - bubble2->y_loc) <= 2);
-}
-
 void initializeBubbles()
 {
-    BUBBLES = (struct bubble*)malloc(ARRAY_SIZE * sizeof(struct bubble));
-
     int it;
     for(it = 0; it < ARRAY_SIZE; it++)
     {
         BUBBLES[it] = bubbleConstructor();
 
         BUBBLES[it].id = it;
-        BUBBLES[it].x_loc = ((it*BUBBLE_WIDTH) + (BUBBLE_WIDTH/2)) % X_MAX;
-        BUBBLES[it].y_loc = ((it*BUBBLE_WIDTH) + (BUBBLE_WIDTH/2)) % Y_MAX;
+        BUBBLES[it].x_loc = it % X_MAX;
+        BUBBLES[it].y_loc = it % Y_MAX;
 
         int randomColour = rand()%4;
 
@@ -55,6 +56,41 @@ void initializeBubbles()
                 BUBBLES[it].colour = YELLOW;
                 break;
             default:
+                BUBBLES[it].colour = YELLOW;
+                break;
+        }  
+    }
+}
+
+void initializeUserBubble()
+{
+    int it;
+    for(it = 0; it < 10; it++)
+    {
+        USER_BUBBLES[it] = bubbleConstructor();
+
+        USER_BUBBLES[it].id = it;
+        USER_BUBBLES[it].x_loc = X_MAX / 2;
+        USER_BUBBLES[it].y_loc = Y_MAX - BUBBLE_WIDTH/2;
+
+        int randomColour = rand()%4;
+
+        switch (randomColour)
+        {
+            case 0:
+                USER_BUBBLES[it].colour = RED;
+                break;
+            case 1:
+                USER_BUBBLES[it].colour = BLUE;
+                break;
+            case 2:
+                USER_BUBBLES[it].colour = GREEN;
+                break;
+            case 3:
+                USER_BUBBLES[it].colour = YELLOW;
+                break;
+            default:
+                USER_BUBBLES[it].colour = YELLOW;
                 break;
         }  
     }
@@ -178,7 +214,7 @@ void clear_screen()
 	{
 		for (y = 0; y < Y_MAX; y++)
 		{
-			plot_pixel(x, y, 0x0000);
+			plot_pixel(x, y, BLACK);
 		}
 	}
 }
@@ -188,4 +224,18 @@ void swap(int *x, int *y)
 	int temp = *x;
 	*x = *y;
 	*y = temp; 
+}
+
+void wait_for_vsync()
+{
+    int *pixel_ctrl_ptr = (int *)PIXEL_BUF_CTRL_BASE;
+	*pixel_ctrl_ptr = 1;
+	volatile int *reg_status = pixel_ctrl_ptr + 3;
+	
+	while(1)
+	{
+		if((*reg_status & 1) == 0) break;
+	}
+	
+	return;
 }

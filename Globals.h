@@ -1,3 +1,6 @@
+#ifndef _GLOBALSH_
+#define _GLOBALSH_
+
 #include "Bubble.h"
 
 #define X_MAX 340
@@ -9,9 +12,12 @@
 #define YELLOW 0xFF00
 #define BLACK 0x0000
 
-#define BUBBLE_WIDTH 3
-#define NULL -1
+#define BUBBLE_WIDTH 20
+//#define NULL -1
 
 volatile int PIXEL_BUFFER_START;
-int ARRAY_SIZE;
-struct bubble* BUBBLES;
+int ARRAY_SIZE = 96;
+struct bubble BUBBLES[96];
+struct bubble USER_BUBBLES[10];
+
+#endif
