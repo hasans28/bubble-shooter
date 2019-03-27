@@ -1,5 +1,8 @@
 #include "util.h"
 
+struct bubble BUBBLES[96];
+struct bubble USER_BUBBLES[10];
+
 int calculateBubblesArraySize()
 {
     int tot_x = X_MAX / BUBBLE_WIDTH;
@@ -31,13 +34,13 @@ struct bubble bubbleConstructor()
 void initializeBubbles()
 {
     int it;
-    for(it = 0; it < ARRAY_SIZE; it++)
+    for(it = 0; it < 96; it++)
     {
         BUBBLES[it] = bubbleConstructor();
 
         BUBBLES[it].id = it;
-        BUBBLES[it].x_loc = it % X_MAX;
-        BUBBLES[it].y_loc = it % Y_MAX;
+        BUBBLES[it].x_loc = (it*BUBBLE_WIDTH) % X_MAX;
+        BUBBLES[it].y_loc = (it/16) * BUBBLE_WIDTH;
 
         int randomColour = rand()%4;
 
@@ -99,7 +102,7 @@ void initializeUserBubble()
 void setupColourMatchLinks()
 {
     int i, j, x_dir, y_dir;
-    for(i = 0; i < ARRAY_SIZE; i++)
+    for(i = 0; i < 96; i++)
     {
         for(x_dir = BUBBLES[i].x_loc - BUBBLE_WIDTH; x_dir <= BUBBLES[i].x_loc + BUBBLE_WIDTH; x_dir += BUBBLE_WIDTH)
         {
@@ -141,11 +144,11 @@ void wipeoutMatchingColours(struct bubble* startingBubble)
 void drawBubbles()
 {
     int count, x, y;
-    for(count = 0; count < ARRAY_SIZE; count++)
+    for(count = 0; count < 96; count++)
     {
-        for(x = BUBBLES[count].x_loc-(BUBBLE_WIDTH/2); x <= BUBBLES[count].x_loc+(BUBBLE_WIDTH/2); x+=(BUBBLE_WIDTH/2))
+        for(x = BUBBLES[count].x_loc; x <= BUBBLES[count].x_loc+BUBBLE_WIDTH-1; x++)
         {
-            for(y = BUBBLES[count].y_loc-(BUBBLE_WIDTH/2); y <= BUBBLES[count].y_loc+(BUBBLE_WIDTH/2); y+=(BUBBLE_WIDTH/2))
+            for(y = BUBBLES[count].y_loc; y <= BUBBLES[count].y_loc+BUBBLE_WIDTH-1; y++)
             {
                 if(x>=0 && x<=X_MAX && y>=0 && y<=Y_MAX) plot_pixel(x, y, BUBBLES[count].colour);
             }
@@ -156,7 +159,7 @@ void drawBubbles()
 int coordsToId(int x, int y)
 {
     int i;
-    for(i = 0; i < ARRAY_SIZE; i++)
+    for(i = 0; i < 96; i++)
     {
         if(BUBBLES[i].x_loc == x && BUBBLES[i].y_loc == y) return BUBBLES[i].id;
     }

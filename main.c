@@ -1,5 +1,7 @@
 #include "util.h"
 
+volatile int PIXEL_BUFFER_START;
+
 int main(void)
 {
     volatile int * pixel_ctrl_ptr = (int *)0xFF203020;

@@ -3,7 +3,7 @@
 
 #include "Bubble.h"
 
-#define X_MAX 340
+#define X_MAX 320
 #define Y_MAX 240
 
 #define RED 0xF800
@@ -15,9 +15,8 @@
 #define BUBBLE_WIDTH 20
 //#define NULL -1
 
-volatile int PIXEL_BUFFER_START;
-int ARRAY_SIZE = 96;
-struct bubble BUBBLES[96];
-struct bubble USER_BUBBLES[10];
+extern volatile int PIXEL_BUFFER_START;
+extern struct bubble BUBBLES[96];
+extern struct bubble USER_BUBBLES[10];
 
 #endif
