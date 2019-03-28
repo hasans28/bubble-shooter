@@ -36,7 +36,7 @@ int main(void)
         }
         /* Erase any boxes and lines that were drawn in the last iteration */
         clear_screen();
-        collisionCheck();
+        displayToHex();
         // code for drawing the boxes and lines 
         drawBubbles();
         drawUserBubbles();

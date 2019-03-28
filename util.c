@@ -2,6 +2,7 @@
 
 struct bubble BUBBLES[96];
 struct bubble USER_BUBBLES[10];
+int HEX_SCORE = 0;
 
 struct bubble bubbleConstructor()
 {
@@ -134,7 +135,7 @@ void wipeoutMatchingColours(struct bubble* startingBubble)
     return;
 }
 
-void collisionCheck()
+bool collisionCheck()
 {
     int i;
     for(i = 0; i < 10; i++)
@@ -151,10 +152,12 @@ void collisionCheck()
                     bub->colour = BLACK;
                     bub->next[0] = &BUBBLES[coordsCheck];
                     wipeoutMatchingColours(bub);
+                    return true;
                 }
             }
         }
     }
+    return false;
 }
 
 void drawBubbles()
@@ -274,4 +277,52 @@ void wait_for_vsync()
 	}
 	
 	return;
+}
+
+int setTempScore()
+{
+    int i, total = 0;
+    for(i = 0; i < 96; i++)
+    {
+        if(BUBBLES[i].colour == BLACK) total++;
+        if(i < 10 && USER_BUBBLES[i].colour == BLACK) total++;
+    }
+
+    return total;
+}
+
+void displayToHex()
+{
+    if(collisionCheck())HEX_SCORE = setTempScore();
+
+    volatile int * HEX3_HEX0_PTR = (int *)HEX3_HEX0_BASE;
+
+    unsigned char seven_seg_decode_table[] = {0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07,
+    0x7F, 0x67, 0x77, 0x7C, 0x39, 0x5E, 0x79, 0x71};
+
+    unsigned char hex_segs[] = {0, 0, 0, 0};
+    unsigned int shift_buffer, nibble;
+    unsigned char code;
+    int i, j;
+    int score = HEX_SCORE;
+
+    for(i = 0; i < 4; i++)
+    {
+        j = score % 10;
+        score /= 10;
+        shift_buffer = j << (4 * i) | shift_buffer;
+    }
+
+    for (i = 0; i < 4; ++i) 
+    {
+        nibble = shift_buffer & 0x0000000F; // character is in rightmost nibble
+        code = seven_seg_decode_table[nibble];
+        hex_segs[i] = code;
+        shift_buffer = shift_buffer >> 4;
+    }
+
+    /* drive the hex displays */
+    *(HEX3_HEX0_PTR) = *(int *)(hex_segs);
+
+    return;
 }

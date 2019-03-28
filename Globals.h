@@ -13,10 +13,10 @@
 #define BLACK 0x0000
 
 #define BUBBLE_WIDTH 20
-//#define NULL (void *)0
 
 extern volatile int PIXEL_BUFFER_START;
 extern struct bubble BUBBLES[96];
 extern struct bubble USER_BUBBLES[10];
+extern int HEX_SCORE;
 
 #endif

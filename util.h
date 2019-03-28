@@ -25,7 +25,9 @@ void drawUserBubbles();
 void setupColourMatchLinks();
 void wipeoutMatchingColours(struct bubble*);
 
-void collisionCheck();
+int setTempScore();
+bool collisionCheck();
+void displayToHex();
 
 void wait_for_vsync();
 
