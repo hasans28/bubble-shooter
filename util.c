@@ -3,22 +3,13 @@
 struct bubble BUBBLES[96];
 struct bubble USER_BUBBLES[10];
 
-int calculateBubblesArraySize()
-{
-    int tot_x = X_MAX / BUBBLE_WIDTH;
-    int tot_y = (Y_MAX * 0.5) / BUBBLE_WIDTH;
-
-    return tot_x * tot_y;
-}
-
 struct bubble bubbleConstructor()
 {
     struct bubble newBubble;
     newBubble.id = NULL;
     newBubble.x_loc = NULL;
     newBubble.y_loc = NULL;
-    newBubble.x_vel = 0;
-    newBubble.y_vel = 0;
+    newBubble.velocity = 0;
     newBubble.colour = BLACK;
     newBubble.visited = false;
 
@@ -73,8 +64,8 @@ void initializeUserBubble()
         USER_BUBBLES[it] = bubbleConstructor();
 
         USER_BUBBLES[it].id = it;
-        USER_BUBBLES[it].x_loc = X_MAX / 2;
-        USER_BUBBLES[it].y_loc = Y_MAX - BUBBLE_WIDTH/2;
+        USER_BUBBLES[it].x_loc = BUBBLE_WIDTH * 8;
+        USER_BUBBLES[it].y_loc = Y_MAX - BUBBLE_WIDTH - 1;
 
         int randomColour = rand()%4;
 
@@ -101,29 +92,31 @@ void initializeUserBubble()
 
 void setupColourMatchLinks()
 {
-    int i, j, x_dir, y_dir;
+    int i, index;
     for(i = 0; i < 96; i++)
     {
-        for(x_dir = BUBBLES[i].x_loc - BUBBLE_WIDTH; x_dir <= BUBBLES[i].x_loc + BUBBLE_WIDTH; x_dir += BUBBLE_WIDTH)
+        index = coordsToId(BUBBLES[i].x_loc-BUBBLE_WIDTH, BUBBLES[i].y_loc);
+        if(index != -1)
         {
-            for(y_dir = BUBBLES[i].y_loc - BUBBLE_WIDTH; y_dir <= BUBBLES[i].y_loc + BUBBLE_WIDTH; y_dir += BUBBLE_WIDTH)
-            {
-                if(!(x_dir == BUBBLES[i].x_loc && y_dir == BUBBLES[i].y_loc) && (x_dir > 0 && x_dir < X_MAX) && (y_dir > 0 && y_dir < Y_MAX*0.5))
-                {
-                    int neighbourId = coordsToId(x_dir, y_dir);
-                    if(neighbourId != -1 && BUBBLES[i].colour == BUBBLES[neighbourId].colour)
-                    {
-                        for(j = 0; j < 8; j++)
-                        {
-                            if(BUBBLES[i].next[j] == NULL)
-                            {
-                               BUBBLES[i].next[j] = &BUBBLES[neighbourId];
-                               break; 
-                            } 
-                        }
-                    } 
-                }
-            }    
+            if(BUBBLES[i].colour == BUBBLES[index].colour) BUBBLES[i].next[0] = &BUBBLES[index];
+        }
+
+        index = coordsToId(BUBBLES[i].x_loc+BUBBLE_WIDTH, BUBBLES[i].y_loc);
+        if(index != -1)
+        {
+            if(BUBBLES[i].colour == BUBBLES[index].colour) BUBBLES[i].next[1] = &BUBBLES[index];
+        }
+
+        index = coordsToId(BUBBLES[i].x_loc, BUBBLES[i].y_loc-BUBBLE_WIDTH);
+        if(index != -1)
+        {
+            if(BUBBLES[i].colour == BUBBLES[index].colour) BUBBLES[i].next[2] = &BUBBLES[index];
+        }
+
+        index = coordsToId(BUBBLES[i].x_loc, BUBBLES[i].y_loc+BUBBLE_WIDTH);
+        if(index != -1)
+        {
+            if(BUBBLES[i].colour == BUBBLES[index].colour) BUBBLES[i].next[3] = &BUBBLES[index];
         }
     }
 }
@@ -133,11 +126,34 @@ void wipeoutMatchingColours(struct bubble* startingBubble)
     startingBubble->visited = true;
 
     int i;
-    for(i = 0; i < 8; i++)
+    for(i = 0; i < 4; i++)
     {
         if(startingBubble->next[i] != NULL && !startingBubble->next[i]->visited) wipeoutMatchingColours(startingBubble->next[i]);
         startingBubble->colour = BLACK;
-        return;
+    }
+    return;
+}
+
+void collisionCheck()
+{
+    int i;
+    for(i = 0; i < 10; i++)
+    {
+        if(USER_BUBBLES[i].id == -1 && USER_BUBBLES[i].velocity != 0)
+        {
+            int coordsCheck = coordsToId(USER_BUBBLES[i].x_loc, USER_BUBBLES[i].y_loc-BUBBLE_WIDTH-1);
+            if(coordsCheck != -1)
+            {
+                USER_BUBBLES[i].velocity = 0;
+                if(USER_BUBBLES[i].colour == BUBBLES[coordsCheck].colour)
+                {
+                    struct bubble* bub = &USER_BUBBLES[i];
+                    bub->colour = BLACK;
+                    bub->next[0] = &BUBBLES[coordsCheck];
+                    wipeoutMatchingColours(bub);
+                }
+            }
+        }
     }
 }
 
@@ -151,6 +167,23 @@ void drawBubbles()
             for(y = BUBBLES[count].y_loc; y <= BUBBLES[count].y_loc+BUBBLE_WIDTH-1; y++)
             {
                 if(x>=0 && x<=X_MAX && y>=0 && y<=Y_MAX) plot_pixel(x, y, BUBBLES[count].colour);
+            }
+        }
+    }
+}
+
+void drawUserBubbles()
+{
+    int count, x, y;
+    for(count = 0; count < 10; count++)
+    {
+        USER_BUBBLES[count].y_loc += USER_BUBBLES[count].velocity;
+
+        for(x = USER_BUBBLES[count].x_loc; x <= USER_BUBBLES[count].x_loc+BUBBLE_WIDTH-1; x++)
+        {
+            for(y = USER_BUBBLES[count].y_loc; y <= USER_BUBBLES[count].y_loc+BUBBLE_WIDTH-1; y++)
+            {
+                if(x>=0 && x<=X_MAX && y>=0 && y<=Y_MAX) plot_pixel(x, y, USER_BUBBLES[count].colour);
             }
         }
     }

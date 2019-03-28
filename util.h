@@ -7,9 +7,9 @@
 
 #include "Bubble.h"
 #include "Globals.h"
+#include "keyResponses.h"
 #include "address_map_arm.h"
 
-int calculateBubblesArraySize();
 struct bubble bubbleConstructor();
 
 void clear_screen();
@@ -21,8 +21,11 @@ int coordsToId(int x, int y);
 void initializeBubbles();
 void initializeUserBubble();
 void drawBubbles();
+void drawUserBubbles();
 void setupColourMatchLinks();
 void wipeoutMatchingColours(struct bubble*);
+
+void collisionCheck();
 
 void wait_for_vsync();
 
