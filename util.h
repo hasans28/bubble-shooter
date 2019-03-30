@@ -4,7 +4,6 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <math.h>
-//#include <time.h>
 
 #include "Bubble.h"
 #include "Globals.h"
@@ -30,5 +29,6 @@ bool collisionCheck();
 void displayToHex();
 
 void wait_for_vsync();
+bool setBoardReset();
 
 #endif

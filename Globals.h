@@ -13,6 +13,8 @@
 #define BLACK 0x0000
 
 #define BUBBLE_WIDTH 20
+#define BUBBLES_ARRAY_SIZE 96
+#define USER_ARRAY_SIZE 10
 
 extern volatile int PIXEL_BUFFER_START;
 extern struct bubble BUBBLES[96];

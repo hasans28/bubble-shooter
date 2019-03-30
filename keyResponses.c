@@ -3,7 +3,7 @@
 void keyZeroResponse()
 {
     int i;
-    for(i = 0; i < 10; i++)
+    for(i = 0; i < USER_ARRAY_SIZE; i++)
     {
         if(USER_BUBBLES[i].id != -1 && USER_BUBBLES[i].x_loc < X_MAX - BUBBLE_WIDTH)
         {
@@ -15,7 +15,7 @@ void keyZeroResponse()
 void keyOneResponse()
 {
     int i;
-    for(i = 0; i < 10; i++)
+    for(i = 0; i < USER_ARRAY_SIZE; i++)
     {
         if(USER_BUBBLES[i].id != -1 && USER_BUBBLES[i].x_loc != 0)
         {
@@ -27,7 +27,7 @@ void keyOneResponse()
 void keyTwoResponse()
 {
     int i;
-    for(i = 9; i >= 0; i--)
+    for(i = USER_ARRAY_SIZE-1; i >= 0; i--)
     {
         if(USER_BUBBLES[i].id != -1)
         {

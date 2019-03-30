@@ -7,10 +7,7 @@ int main(void)
     volatile int * pixel_ctrl_ptr = (int *)0xFF203020;
     volatile int * KEY_ptr = (int *)KEY_BASE;
     int KEY_Value;
-
-    initializeBubbles();
-    setupColourMatchLinks();
-    initializeUserBubble();
+    bool Reset_Board;
 
     /* set front pixel buffer to start of FPGA On-chip memory */
     *(pixel_ctrl_ptr + 1) = 0xC8000000; // first store the address in the 
@@ -24,25 +21,36 @@ int main(void)
     *(pixel_ctrl_ptr + 1) = 0xC0000000;
     PIXEL_BUFFER_START = *(pixel_ctrl_ptr + 1); // we draw on the back buffer
 
-    while (1)
+    while(1)
     {
-        KEY_Value = *(KEY_ptr);
-        if(KEY_Value != 0)
-        {
-            if(KEY_Value == 1)keyZeroResponse();
-            else if(KEY_Value == 2)keyOneResponse();
-            else if(KEY_Value == 4)keyTwoResponse();
-            while(*KEY_ptr);
-        }
-        /* Erase any boxes and lines that were drawn in the last iteration */
-        clear_screen();
-        displayToHex();
-        // code for drawing the boxes and lines 
-        drawBubbles();
-        drawUserBubbles();
-        // code for updating the locations of boxes
+        Reset_Board = false;
 
-        wait_for_vsync(); // swap front and back buffers on VGA vertical sync
-        PIXEL_BUFFER_START = *(pixel_ctrl_ptr + 1); // new back buffer
+        initializeBubbles();
+        setupColourMatchLinks();
+        initializeUserBubble();
+
+        while (!Reset_Board)
+        {
+            KEY_Value = *(KEY_ptr);
+            if(KEY_Value != 0)
+            {
+                if(KEY_Value == 1)keyZeroResponse();
+                else if(KEY_Value == 2)keyOneResponse();
+                else if(KEY_Value == 4)keyTwoResponse();
+                while(*KEY_ptr);
+            }
+            /* Erase any boxes and lines that were drawn in the last iteration */
+            clear_screen();
+            displayToHex();
+            // code for drawing the boxes and lines 
+            drawBubbles();
+            drawUserBubbles();
+            // code for updating the locations of boxes
+            Reset_Board = setBoardReset();
+
+            wait_for_vsync(); // swap front and back buffers on VGA vertical sync
+            PIXEL_BUFFER_START = *(pixel_ctrl_ptr + 1); // new back buffer
+        }
     }
+    
 }

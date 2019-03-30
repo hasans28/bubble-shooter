@@ -15,7 +15,7 @@ struct bubble bubbleConstructor()
     newBubble.visited = false;
 
     int i;
-    for(i = 0; i < 8; i++)
+    for(i = 0; i < 4; i++)
     {
         newBubble.next[i] = NULL;
     }
@@ -26,7 +26,7 @@ struct bubble bubbleConstructor()
 void initializeBubbles()
 {
     int it;
-    for(it = 0; it < 96; it++)
+    for(it = 0; it < BUBBLES_ARRAY_SIZE; it++)
     {
         BUBBLES[it] = bubbleConstructor();
 
@@ -96,7 +96,7 @@ void initializeUserBubble()
 void setupColourMatchLinks()
 {
     int i, index;
-    for(i = 0; i < 96; i++)
+    for(i = 0; i < BUBBLES_ARRAY_SIZE; i++)
     {
         index = coordsToBubbleId(BUBBLES[i].x_loc-BUBBLE_WIDTH, BUBBLES[i].y_loc);
         if(index != -1)
@@ -142,7 +142,7 @@ bool collisionCheck()
     int i, j, bubbleId, userBubbleId, colour;
     struct bubble* next;
 	bool wipeOut = false;
-    for(i = 0; i < 10; i++)
+    for(i = 0; i < USER_ARRAY_SIZE; i++)
     {
         if(USER_BUBBLES[i].id == -1 && USER_BUBBLES[i].velocity != 0)
         {
@@ -215,7 +215,7 @@ bool collisionCheck()
 void drawBubbles()
 {
     int count, x, y;
-    for(count = 0; count < 96; count++)
+    for(count = 0; count < BUBBLES_ARRAY_SIZE; count++)
     {
         for(x = BUBBLES[count].x_loc; x <= BUBBLES[count].x_loc+BUBBLE_WIDTH-1; x++)
         {
@@ -230,7 +230,7 @@ void drawBubbles()
 void drawUserBubbles()
 {
     int count, x, y;
-    for(count = 0; count < 10; count++)
+    for(count = 0; count < USER_ARRAY_SIZE; count++)
     {
         USER_BUBBLES[count].y_loc += USER_BUBBLES[count].velocity;
 
@@ -247,7 +247,7 @@ void drawUserBubbles()
 int coordsToBubbleId(int x, int y)
 {
     int i;
-    for(i = 0; i < 96; i++)
+    for(i = 0; i < BUBBLES_ARRAY_SIZE; i++)
     {
         if(BUBBLES[i].x_loc == x && BUBBLES[i].y_loc == y && BUBBLES[i].colour != BLACK) return BUBBLES[i].id;
     }
@@ -258,7 +258,7 @@ int coordsToBubbleId(int x, int y)
 int coordsToUserId(int x, int y)
 {
     int i;
-    for(i = 0; i < 10; i++)
+    for(i = 0; i < USER_ARRAY_SIZE; i++)
     {
         if(USER_BUBBLES[i].x_loc == x && USER_BUBBLES[i].y_loc == y && USER_BUBBLES[i].colour != BLACK) return i;
     }
@@ -297,13 +297,24 @@ void wait_for_vsync()
 	return;
 }
 
+bool setBoardReset()
+{
+    int i, count = 0;
+    for(i = 0; i < USER_ARRAY_SIZE; i++)
+    {
+        if(USER_BUBBLES[i].id == -1 && USER_BUBBLES[i].velocity == 0) count++;
+    }
+    if(count == USER_ARRAY_SIZE) return true;
+    return false;
+}
+
 int setTempScore()
 {
     int i, total = 0;
-    for(i = 0; i < 96; i++)
+    for(i = 0; i < BUBBLES_ARRAY_SIZE; i++)
     {
         if(BUBBLES[i].colour == BLACK) total++;
-        if(i < 10 && USER_BUBBLES[i].colour == BLACK) total++;
+        if(i < USER_ARRAY_SIZE && USER_BUBBLES[i].colour == BLACK) total++;
     }
 
     return total;
