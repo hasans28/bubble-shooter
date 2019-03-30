@@ -34,6 +34,7 @@ void initializeBubbles()
         BUBBLES[it].x_loc = (it*BUBBLE_WIDTH) % X_MAX;
         BUBBLES[it].y_loc = (it/16) * BUBBLE_WIDTH;
 
+		//srand(time(0));
         int randomColour = rand()%4;
 
         switch (randomColour)
@@ -66,8 +67,9 @@ void initializeUserBubble()
 
         USER_BUBBLES[it].id = it;
         USER_BUBBLES[it].x_loc = BUBBLE_WIDTH * 8;
-        USER_BUBBLES[it].y_loc = Y_MAX - BUBBLE_WIDTH - 1;
+        USER_BUBBLES[it].y_loc = Y_MAX - BUBBLE_WIDTH;
 
+		//srand(time(0));
         int randomColour = rand()%4;
 
         switch (randomColour)
@@ -96,25 +98,25 @@ void setupColourMatchLinks()
     int i, index;
     for(i = 0; i < 96; i++)
     {
-        index = coordsToId(BUBBLES[i].x_loc-BUBBLE_WIDTH, BUBBLES[i].y_loc);
+        index = coordsToBubbleId(BUBBLES[i].x_loc-BUBBLE_WIDTH, BUBBLES[i].y_loc);
         if(index != -1)
         {
             if(BUBBLES[i].colour == BUBBLES[index].colour) BUBBLES[i].next[0] = &BUBBLES[index];
         }
 
-        index = coordsToId(BUBBLES[i].x_loc+BUBBLE_WIDTH, BUBBLES[i].y_loc);
+        index = coordsToBubbleId(BUBBLES[i].x_loc+BUBBLE_WIDTH, BUBBLES[i].y_loc);
         if(index != -1)
         {
             if(BUBBLES[i].colour == BUBBLES[index].colour) BUBBLES[i].next[1] = &BUBBLES[index];
         }
 
-        index = coordsToId(BUBBLES[i].x_loc, BUBBLES[i].y_loc-BUBBLE_WIDTH);
+        index = coordsToBubbleId(BUBBLES[i].x_loc, BUBBLES[i].y_loc-BUBBLE_WIDTH);
         if(index != -1)
         {
             if(BUBBLES[i].colour == BUBBLES[index].colour) BUBBLES[i].next[2] = &BUBBLES[index];
         }
 
-        index = coordsToId(BUBBLES[i].x_loc, BUBBLES[i].y_loc+BUBBLE_WIDTH);
+        index = coordsToBubbleId(BUBBLES[i].x_loc, BUBBLES[i].y_loc+BUBBLE_WIDTH);
         if(index != -1)
         {
             if(BUBBLES[i].colour == BUBBLES[index].colour) BUBBLES[i].next[3] = &BUBBLES[index];
@@ -137,27 +139,77 @@ void wipeoutMatchingColours(struct bubble* startingBubble)
 
 bool collisionCheck()
 {
-    int i;
+    int i, j, bubbleId, userBubbleId, colour;
+    struct bubble* next;
+	bool wipeOut = false;
     for(i = 0; i < 10; i++)
     {
         if(USER_BUBBLES[i].id == -1 && USER_BUBBLES[i].velocity != 0)
         {
-            int coordsCheck = coordsToId(USER_BUBBLES[i].x_loc, USER_BUBBLES[i].y_loc-BUBBLE_WIDTH-1);
-            if(coordsCheck != -1)
+			struct bubble* bub = &USER_BUBBLES[i];
+			
+            // Checking upwards
+            bubbleId = coordsToBubbleId(USER_BUBBLES[i].x_loc, USER_BUBBLES[i].y_loc-BUBBLE_WIDTH);
+            userBubbleId = coordsToUserId(USER_BUBBLES[i].x_loc, USER_BUBBLES[i].y_loc-BUBBLE_WIDTH);
+            if(bubbleId != -1 || userBubbleId != -1)
             {
-                USER_BUBBLES[i].velocity = 0;
-                if(USER_BUBBLES[i].colour == BUBBLES[coordsCheck].colour)
-                {
-                    struct bubble* bub = &USER_BUBBLES[i];
-                    bub->colour = BLACK;
-                    bub->next[0] = &BUBBLES[coordsCheck];
-                    wipeoutMatchingColours(bub);
-                    return true;
-                }
+                 colour = (bubbleId == -1) ? USER_BUBBLES[userBubbleId].colour : BUBBLES[bubbleId].colour;
+                 next = (bubbleId == -1) ? &USER_BUBBLES[userBubbleId] : &BUBBLES[bubbleId];
+                 if(colour != BLACK)
+                 {
+                     bub->velocity = 0;
+                     if(bub->colour == colour)
+                     {
+                         bub->colour = BLACK;
+                         bub->next[0] = next; 
+                         wipeOut = true;
+                     }
+                 }
             }
-        }
+
+            //Checking to the left
+            bubbleId = coordsToBubbleId(USER_BUBBLES[i].x_loc-BUBBLE_WIDTH, USER_BUBBLES[i].y_loc);
+            userBubbleId = coordsToUserId(USER_BUBBLES[i].x_loc-BUBBLE_WIDTH, USER_BUBBLES[i].y_loc);
+            if(bubbleId != -1 || userBubbleId != -1)
+            {
+                 colour = (bubbleId == -1) ? USER_BUBBLES[userBubbleId].colour : BUBBLES[bubbleId].colour;
+                 next = (bubbleId == -1) ? &USER_BUBBLES[userBubbleId] : &BUBBLES[bubbleId];
+                 if(colour != BLACK)
+                 {
+                     if(bub->colour == colour && bub->next[0] != NULL)
+                     {
+                         bub->velocity = 0;
+                         bub->colour = BLACK;
+                         bub->next[1] = next;
+                         wipeOut = true;
+                     }
+                 }
+            }
+
+            //Checking to the right
+            bubbleId = coordsToBubbleId(USER_BUBBLES[i].x_loc+BUBBLE_WIDTH, USER_BUBBLES[i].y_loc);
+            userBubbleId = coordsToUserId(USER_BUBBLES[i].x_loc+BUBBLE_WIDTH, USER_BUBBLES[i].y_loc);
+            if(bubbleId != -1 || userBubbleId != -1)
+            {
+                 colour = (bubbleId == -1) ? USER_BUBBLES[userBubbleId].colour : BUBBLES[bubbleId].colour;
+                 next = (bubbleId == -1) ? &USER_BUBBLES[userBubbleId] : &BUBBLES[bubbleId];
+                 if(colour != BLACK)
+                 {
+                     if(bub->colour == colour && bub->next[0] != NULL)
+                     {
+                         bub->velocity = 0;
+                         bub->colour = BLACK;
+                         bub->next[2] = next;
+                         wipeOut = true;
+                     }
+                 }
+            }
+        
+			if(wipeOut) wipeoutMatchingColours(bub);
+		}
     }
-    return false;
+	
+    return wipeOut;
 }
 
 void drawBubbles()
@@ -169,7 +221,7 @@ void drawBubbles()
         {
             for(y = BUBBLES[count].y_loc; y <= BUBBLES[count].y_loc+BUBBLE_WIDTH-1; y++)
             {
-                if(x>=0 && x<=X_MAX && y>=0 && y<=Y_MAX) plot_pixel(x, y, BUBBLES[count].colour);
+                if(x>=0 && x<=X_MAX && y>=0 && y<=Y_MAX && BUBBLES[count].colour != BLACK) plot_pixel(x, y, BUBBLES[count].colour);
             }
         }
     }
@@ -186,18 +238,29 @@ void drawUserBubbles()
         {
             for(y = USER_BUBBLES[count].y_loc; y <= USER_BUBBLES[count].y_loc+BUBBLE_WIDTH-1; y++)
             {
-                if(x>=0 && x<=X_MAX && y>=0 && y<=Y_MAX) plot_pixel(x, y, USER_BUBBLES[count].colour);
+                if(x>=0 && x<=X_MAX && y>=0 && y<=Y_MAX && USER_BUBBLES[count].colour != BLACK) plot_pixel(x, y, USER_BUBBLES[count].colour);
             }
         }
     }
 }
 
-int coordsToId(int x, int y)
+int coordsToBubbleId(int x, int y)
 {
     int i;
     for(i = 0; i < 96; i++)
     {
-        if(BUBBLES[i].x_loc == x && BUBBLES[i].y_loc == y) return BUBBLES[i].id;
+        if(BUBBLES[i].x_loc == x && BUBBLES[i].y_loc == y && BUBBLES[i].colour != BLACK) return BUBBLES[i].id;
+    }
+
+    return -1;
+}
+
+int coordsToUserId(int x, int y)
+{
+    int i;
+    for(i = 0; i < 10; i++)
+    {
+        if(USER_BUBBLES[i].x_loc == x && USER_BUBBLES[i].y_loc == y && USER_BUBBLES[i].colour != BLACK) return i;
     }
 
     return -1;
@@ -206,44 +269,6 @@ int coordsToId(int x, int y)
 void plot_pixel(int x, int y, short int line_color)
 {
     *(short int *)(PIXEL_BUFFER_START + (y << 10) + (x << 1)) = line_color;
-}
-
-void draw_line(int x0, int y0, int x1, int y1, short int line_color)
-{
-	bool is_steep = abs(y1 - y0) > abs(x1 - x0);
-	
-	if(is_steep){
-		swap(&x0, &y0);
-		swap(&x1, &y1);
-	}
-	
-	if(x0 > x1){
-		swap(&x0, &x1);
-		swap(&y0, &y1);
-	}
-	
-	int deltax = x1 - x0;
-	int deltay = abs(y1 - y0);
-	int error = -(deltax / 2);
-	int y = y0;
-	
-	int y_step;
-	if (y0 < y1) y_step = 1;
-	else y_step = -1;
-	
-	int x;
-	for(x = x0; x <= x1; x++)
-	{
-		if(is_steep) plot_pixel(y, x, line_color);
-		else plot_pixel(x, y, line_color);
-		error = error + deltay;
-		
-		if(error >= 0)
-		{
-			y = y + y_step;
-			error = error - deltax;
-		}
-	}
 }
 
 void clear_screen()
@@ -256,13 +281,6 @@ void clear_screen()
 			plot_pixel(x, y, BLACK);
 		}
 	}
-}
-
-void swap(int *x, int *y)
-{
-	int temp = *x;
-	*x = *y;
-	*y = temp; 
 }
 
 void wait_for_vsync()

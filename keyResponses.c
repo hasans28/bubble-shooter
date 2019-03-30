@@ -31,7 +31,7 @@ void keyTwoResponse()
     {
         if(USER_BUBBLES[i].id != -1)
         {
-            USER_BUBBLES[i].velocity = -98;
+            USER_BUBBLES[i].velocity = -(BUBBLE_WIDTH);
             USER_BUBBLES[i].id = -1;
             return;
         } 
