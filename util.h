@@ -7,28 +7,20 @@
 
 #include "Bubble.h"
 #include "Globals.h"
+//#include "exceptions.h"
 #include "keyResponses.h"
 #include "address_map_arm.h"
 
-struct bubble bubbleConstructor();
+bool collisionCheck();
+bool setBoardReset();
 
-void clear_screen();
-void plot_pixel(int x, int y, short int line_color);
+int setTempScore();
 int coordsToBubbleId(int x, int y);
 int coordsToUserId(int x, int y);
 
-void initializeBubbles();
-void initializeUserBubble();
-void drawBubbles();
-void drawUserBubbles();
-void setupColourMatchLinks();
-void wipeoutMatchingColours(struct bubble*);
-
-int setTempScore();
-bool collisionCheck();
+void clear_screen();
 void displayToHex();
-
 void wait_for_vsync();
-bool setBoardReset();
+void plot_pixel(int x, int y, short int line_color);
 
 #endif

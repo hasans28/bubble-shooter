@@ -1,7 +1,7 @@
 #ifndef _BUBBLEH_
 #define _BUBBLEH_
 
-#include <stdbool.h>
+#include "util.h"
 
 struct bubble 
 {

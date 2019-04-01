@@ -9,6 +9,11 @@ int main(void)
     int KEY_Value;
     bool Reset_Board;
 
+    set_A9_IRQ_stack();
+    config_GIC();
+    config_PS2();
+    enable_A9_interrupts();
+    
     /* set front pixel buffer to start of FPGA On-chip memory */
     *(pixel_ctrl_ptr + 1) = 0xC8000000; // first store the address in the 
                                         // back buffer
@@ -31,14 +36,6 @@ int main(void)
 
         while (!Reset_Board)
         {
-            KEY_Value = *(KEY_ptr);
-            if(KEY_Value != 0)
-            {
-                if(KEY_Value == 1)keyZeroResponse();
-                else if(KEY_Value == 2)keyOneResponse();
-                else if(KEY_Value == 4)keyTwoResponse();
-                while(*KEY_ptr);
-            }
             /* Erase any boxes and lines that were drawn in the last iteration */
             clear_screen();
             displayToHex();
