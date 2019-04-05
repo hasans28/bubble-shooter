@@ -14,11 +14,12 @@
 
 #define BUBBLE_WIDTH 20
 #define BUBBLES_ARRAY_SIZE 96
-#define USER_ARRAY_SIZE 10
+#define USER_ARRAY_SIZE 20
 
 extern volatile int PIXEL_BUFFER_START;
 extern struct bubble BUBBLES[96];
-extern struct bubble USER_BUBBLES[10];
+extern struct bubble USER_BUBBLES[20];
 extern int HEX_SCORE;
+extern int ROUND_SCORE;
 
 #endif

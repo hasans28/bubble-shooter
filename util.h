@@ -4,10 +4,11 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <math.h>
+#include <sys/time.h>
 
 #include "Bubble.h"
 #include "Globals.h"
-//#include "exceptions.h"
+#include "exceptions.h"
 #include "keyResponses.h"
 #include "address_map_arm.h"
 

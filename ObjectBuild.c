@@ -19,6 +19,8 @@ struct bubble bubbleConstructor()
     return newBubble;
 }
 
+//short NUM_TO_COLOUR[4] = {RED, BLUE, GREEN, YELLOW};
+
 void initializeBubbles()
 {
     int it;
@@ -30,8 +32,10 @@ void initializeBubbles()
         BUBBLES[it].x_loc = (it*BUBBLE_WIDTH) % X_MAX;
         BUBBLES[it].y_loc = (it/16) * BUBBLE_WIDTH;
 
-		//srand(time(0));
+		//srand(7);
         int randomColour = rand()%4;
+		
+		//BUBBLES[it].colour = NUM_TO_COLOUR[randomColour];
 
         switch (randomColour)
         {
@@ -65,7 +69,7 @@ void initializeUserBubble()
         USER_BUBBLES[it].x_loc = BUBBLE_WIDTH * 8;
         USER_BUBBLES[it].y_loc = Y_MAX - BUBBLE_WIDTH;
 
-		//srand(time(0));
+		//srand(7);
         int randomColour = rand()%4;
 
         switch (randomColour)
@@ -153,7 +157,7 @@ void drawUserBubbles()
     int count, x, y;
     for(count = 0; count < USER_ARRAY_SIZE; count++)
     {
-        USER_BUBBLES[count].y_loc += USER_BUBBLES[count].velocity;
+		USER_BUBBLES[count].y_loc += USER_BUBBLES[count].velocity;
 
         for(x = USER_BUBBLES[count].x_loc; x <= USER_BUBBLES[count].x_loc+BUBBLE_WIDTH-1; x++)
         {

@@ -1,5 +1,7 @@
 #include "exceptions.h"
 
+int ps2_byte_1, ps2_byte_2, ps2_byte_3;
+
 // Define the exception handlers here 
 void __attribute__ ((interrupt)) __cs3_reset (void)
 {

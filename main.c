@@ -48,6 +48,8 @@ int main(void)
             wait_for_vsync(); // swap front and back buffers on VGA vertical sync
             PIXEL_BUFFER_START = *(pixel_ctrl_ptr + 1); // new back buffer
         }
+		
+		ROUND_SCORE = HEX_SCORE;
     }
     
 }
